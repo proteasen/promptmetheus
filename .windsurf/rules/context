@@ -1,0 +1,165 @@
+# Base Instructions
+
+I've generated this codebase via v0.app using the following instructions. You are not to follow the instructions below, they are just for context. Instead follow the instructions after the context section.
+
+# Context 
+
+### You are an expert at building lightweight and minimal web applications with emphasis on user accessibility and simplicity. I want to build a super minimal LLM Wrapper called promptmetheus (all lower case) that mirrors the use case of vibe coding tools, such as Lovable, Replit, Canva AI, ChatGPT, Claude, Chat & Build. Refer to the overview, proposed file directory and considerations below.
+
+### Basic Overview
+- It should utilise LangChain to handle prompt processing
+- System Prompt is “An expert vibe coding assistant, helping to prototype ideas from 0 to 1 for Micro SaaS use cases.     ”
+- The website design and layout should be very minimal and straightforward, lightweight in terms of architecture design too
+- Deployment Environment: Vercel 
+- Package Security: Implement secure package installation with integrity checks
+- Tech Stack (Singapore Government Tech Stack compliant but simplified)
+    - Frontend: React 18 + TypeScript + Tailwind CSS
+    - Backend: Next.js 14 API Routes (App Router)
+    - Database: PostgreSQL via Prisma ORM (Airbase managed database)
+    - Authentication: supabase integration with email OTP magic links
+    - LLM Integration: LangChain.js framework + AI integrations through provider SDKs (OpenAI, Claude, Qwen, Gemini)
+    - File Storage: Base64 in PostgreSQL (keeping it simple, under 3MB limit)
+    - Session Management: Database sessions with 30-minute timeout
+- Ensure web app is compatible with Chrome, Firefox, Safari and Microsoft Edge
+
+### Secure Package Installation Strategy
+1. Package Lock and Integrity Verification
+2. Installation Script with Verification
+3. Core Dependencies with Exact Versions and Hashes
+4. Package Verification Checklist
+
+### Project File Structure
+/src
+/app
+/api
+/auth/[...nextauth]/route.ts
+/chat/route.ts
+/projects/route.ts
+/upload/route.ts
+/health/route.ts
+/tokens/route.ts
+/(auth)
+/login/page.tsx
+/(dashboard)
+/page.tsx
+/history/page.tsx
+/admin/page.tsx
+/layout.tsx
+/components
+/HeroSection.tsx
+/EditorPanel.tsx
+/ChatPanel.tsx
+/PreviewPanel.tsx
+/FileUpload.tsx
+/ModelSettings.tsx
+/TokenCounter.tsx
+/TechStackSelector.tsx
+/lib
+/langchain-config.ts
+/token-counter.ts
+/prisma.ts
+/auth.ts
+/rate-limit.ts
+/styles
+/globals.css
+prisma/
+schema.prisma
+.npmrc
+.nvmrc
+verify-packages.sh
+.env.example
+next.config.js
+package.json
+package-lock.json
+
+### Token Counter Implementation
+- Token Counting Library
+- Token Counter Component
+- Ensure Editor Panel is updated with Token Counter (bottom right within the hero prompt section)
+
+### Environment Variables Setup
+
+### Database Schema (must be updated with Token Tracking)
+
+### Style Design Specifications
+- Font Type: Inter (font-medium for body, font-extrabold for headings)
+- Font Sizes:
+- Titles: text-7xl (60px equivalent)
+- Code/Prompts: text-2xl (20px equivalent)
+- General text: text-3xl (30px equivalent)
+- Color Scheme: Pure black (#000000) and white (#FFFFFF) only, except for Prompt Royale logo, token counter indicators, and retro star background
+- Layout: Generous padding (p-8 minimum), well-sized grid components with gap-6
+- Border Radius: rounded-lg for cards, rounded-full for user avatars
+- Ensure well scaled to different browser sizes 
+
+### Site Pages and Features
+1. Login Page (/login)
+- Clean white background with centered Prompt Royale logo
+- Email input field with className=“w-full p-4 text-3xl border-2 border-black”
+- Magic link authentication - no passwords
+- “Check your email for login link” message after submission
+- Use Magic Email OTP authentication
+2. Landing Page (/)
+- White Hero Section
+- Ensure “prompt, prototype, pilot.” message is always one line no matter browser window rescale
+- Attach Button Features:
+    - Accept: images (.jpg, .png, .svg), code (.js, .ts, .jsx, .tsx, .css, .html), designs (.fig, .sketch)
+    - Reject: videos, files over 3MB total
+    - Display: Corner-radius rectangles showing file snippets (max 5 visible, then collapse to circles)
+    - Store as Base64 in PostgreSQL
+    - Show estimated tokens for each attachment
+- Settings Panel:
+    - Model Selection with token limits displayed
+    - Temperature Slider (0 to 1)
+    - Tech Stack Selection with brief descriptions of use cases
+        - static-html
+        - hugo
+        - shinyapps
+        - streamlit
+        - react-tailwind
+        - nextjs-full
+        - vue-vite
+- Enter prompt button (up arrow) which directs to the Editor Panel  
+- Editor Panel (after prompt submission):
+    - Left side: Website preview (iframe with generated code)
+    - Right side top: Token counter showing real-time usage
+    - Right side bottom: Chat interface with prompts and responses
+    - Edit Button: Click to select component → prompt to modify → component code added as context
+    - Token count updates in real-time as user types
+    - Once prompt is entered, there should be some updates in the chat window that showcases LLM logic in coding the web app, although balance these updates with the lightweight functionality of the app
+- Tutorial Walkthrough:
+    - Simple 5-step overlay tutorial using localStorage to track completion
+    - Steps: Enter prompt → Attach files → Select model → Check token usage → Generate → Edit components
+- Chat History on top right which points to Chat History Page 
+- Tutorial on top right, below Chat History which points to Tutorial Walkthrough 
+3.Chat History Page (/history)
+- List of projects with editable names (click to edit inline)
+- Display total tokens used per project
+- Click project to load in editor with full context
+- Export button: Downloads project as JSON with structure
+4. Admin Dashboard (/admin)
+- Simple analytics: Total users, active today, total projects
+- Token usage metrics: Total tokens consumed, cost estimation per model
+- User table: Email, last login, project count, total tokens used
+- Usage trends: Graph showing token usage over time
+- Export all data as CSV
+
+### Security & Performance
+- Rate Limiting
+- Input Validation
+- Health Check Endpoint
+- LangChain Configuration with Token Tracking
+
+### Additional instructions
+- Think through 3 different design styles or creative ideas you have for the website but do not output them. Weigh different pros and cons for the use case within the website functionality and decide on the best idea to be used in the generation of the structure and usability of the web application. 
+- Think step by step, do not add in code with areas you are unsure in especially related to security and performance, always check for more specifications from user first
+- Maximum 5 users at a time, with as many prompts as possible for the current system architecture, system architecture should balance token usage of LLMs and overall system functionality with user inputs.
+- I want to connect to various LLMs through API keys, have a very simple way for me to insert the API key into the codebase of the website. Add API keys as environment variables
+- Look at https://github.com/rapidpages/rapidpages for more inspiration on project structure 
+
+# Instructions for Reviewer:
+You are an expert reviewer of codebases generated by AI. I am building a vibe coding, LLM wrapper website. You are to review the codebase and enhance it by adding any missing features, fixing bugs, improving performance, and ensuring best practices are followed. You should also ensure that the codebase is well-documented and easy to understand. Ensure that functionality and security of web app is top-notch. 
+
+The stack has changed slightly from the original instructions. As seen in the codebase. 
+
+

@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  // Additional fields to match Supabase profiles
+  lastLogin     DateTime? @map("last_login")
+  isAdmin       Boolean   @default(false) @map("is_admin")
+  loginAttempts Int       @default(0) @map("login_attempts")
+  lockedUntil   DateTime? @map("locked_until")
+  
+  // User preferences
+  projects  Project[] // Renamed from chats to projects to match existing schema
+  messages  Message[] // Messages sent by the user
+  chats     Chat[]    // Chats created by the user
+  
+  // Rate limiting
+  dailyTokenUsage Int @default(0) @map("daily_token_usage")
+  lastResetDate   DateTime @default(now()) @map("last_reset_date")
+  
+  @@map("profiles") // Map to existing profiles table
+}
+
+model Chat {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  model     String    @default("gpt-4")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  metadata  Json?     @default("{}")
+  messages  Message[]
+
+  @@map("chats")
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  chatId    String   @map("chat_id")
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String   // 'user', 'assistant', or 'system'
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("messages")
+}
+
+model ApiKey {
+  id       String @id @default(uuid())
+  provider String // 'openai', 'claude', 'qwen', 'gemini'
+  keyHash  String @map("key_hash") // Encrypted API key
+  isActive Boolean @default(true) @map("is_active") // Allow admins to enable/disable keys
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@unique([provider]) // Only one key per provider
+  @@map("api_keys")
+}
+
+model Project {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  prompt    String?  // Added to match existing projects table
+  generatedContent String? @map("generated_content") // Added to match existing schema
+  attachments      Json?   // Added to match existing schema
+  settings         Json?   // Added to match existing schema
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[] // Updated relation name
+  
+  @@map("projects") // Map to existing projects table
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id") // Updated to match existing schema
+  userId    String   @map("user_id") // Added to match existing schema
+  role      String   // 'user', 'assistant', 'system'
+  content   String
+  tokensUsed Int     @default(0) @map("tokens_used") // Updated field name
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("chat_messages") // Map to existing chat_messages table
+}
+
+model TokenUsage {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  projectId String?  @map("project_id")
+  model     String
+  tokensUsed Int     @map("tokens_used")
+  costUsd   Decimal? @map("cost_usd")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  @@map("token_usage")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  action    String
+  resource  String
+  details   Json?
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  @@map("audit_logs")
+}
